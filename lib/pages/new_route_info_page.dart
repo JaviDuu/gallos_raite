@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'route_model.dart';
+
 import 'map_screen.dart'; // Importamos la nueva pantalla del mapa
 
 class NewRouteInfoPage extends StatefulWidget {
@@ -12,6 +14,8 @@ class NewRouteInfoPage extends StatefulWidget {
 
 class _NewRouteInfoPageState extends State<NewRouteInfoPage> {
   final _formKey = GlobalKey<FormState>();
+  TextEditingController _originController = TextEditingController();
+  TextEditingController _destinationController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +47,7 @@ class _NewRouteInfoPageState extends State<NewRouteInfoPage> {
               ),
               SizedBox(height: 20),
               TextFormField(
+                controller: _originController,
                 decoration: InputDecoration(
                   labelText: 'Origen',
                 ),
@@ -55,6 +60,7 @@ class _NewRouteInfoPageState extends State<NewRouteInfoPage> {
               ),
               SizedBox(height: 10),
               TextFormField(
+                controller: _destinationController,
                 decoration: InputDecoration(
                   labelText: 'Destino',
                 ),
@@ -87,7 +93,14 @@ class _NewRouteInfoPageState extends State<NewRouteInfoPage> {
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    // Aquí iría la lógica para guardar la nueva ruta
+                    // Crear un nuevo RouteModel con los datos del formulario
+                    final newRoute = RouteModel(
+                      id: DateTime.now().toString(),
+                      routeName: widget.routeName,
+                      origin: _originController.text,
+                      destination: _destinationController.text,
+                    );
+                    Navigator.pop(context, newRoute);
                     _showSuccessDialog(context);
                   }
                 },
@@ -126,4 +139,3 @@ class _NewRouteInfoPageState extends State<NewRouteInfoPage> {
     );
   }
 }
-  

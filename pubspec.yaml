@@ -23,3 +23,4 @@ flutter:
   assets:
     - assets/profile_picture.png
     - assets/mapa.png  
+    - assets/logo.png

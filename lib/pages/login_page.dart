@@ -1,52 +1,150 @@
 import 'package:flutter/material.dart';
+import 'register_page.dart';
 
-class LoginPage extends StatelessWidget {
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Gallo Raites',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: LoginPage(),
+    );
+  }
+}
+
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+// Aquí pueden agregar la lógica de autenticación, si no les sirve quitenlo
+  void _login() {
+    if (_formKey.currentState!.validate()) {
+      print('Email: ${_emailController.text}');
+      print('Password: ${_passwordController.text}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                'UAA-BUS',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueAccent,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 32.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset(
+                  'assets/logo.png', // Aquí se pone el logo
+                  height: 120.0,
                 ),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Email',
+                SizedBox(height: 16.0),
+                Text(
+                  'Gallo Raites',
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Password',
+                SizedBox(height: 16.0),
+                Text(
+                  'Iniciar Sesión',
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-                obscureText: true,
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/main');
-                },
-                child: Text('Login'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/register');
-                },
-                child: Text('Sign Up'),
-              ),
-            ],
+                SizedBox(height: 32.0),
+                TextFormField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    hintText: 'email@edu.uaa.mx',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ingresa tu email';
+                    }
+                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                      return 'Ingresa un email válido';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 16.0),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Contraseña',
+                    hintText: 'Contraseña...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ingresa tu contraseña';
+                    }
+                    if (value.length < 6) {
+                      return 'La contraseña debe tener al menos 6 caracteres';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 32.0),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _login,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromARGB(255, 3, 5, 133), // Color del botón
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    child: Text(
+                      'iniciar sesión',
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text('¿Aún no tienes una cuenta?'),
+                    TextButton(
+                      onPressed: () {
+                         Navigator.pushNamed(context, '/register'); // Navegar a la pantalla de registro
+                      },
+                      child: Text('Registrarse ahora.'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

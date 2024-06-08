@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart'; // Importamos la pantalla inicial
+import 'trips_page.dart'; // Importamos la pantalla de viajes
 
 class MapScreen extends StatelessWidget {
   @override
@@ -21,7 +21,7 @@ class MapScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => HomePage(), // Dirige al usuario de vuelta a la pantalla inicial
+                    builder: (context) => TripsPage(),
                   ),
                 );
               },
