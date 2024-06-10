@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class Career {
+  final int id;
+  final String name;
+
+  Career(this.id, this.name);
+}
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -7,6 +16,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -15,13 +25,46 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _semesterController = TextEditingController();
   final TextEditingController _entryDateController = TextEditingController();
   final TextEditingController _studentIdController = TextEditingController();
+  final TextEditingController _birthdateController = TextEditingController();
+  final TextEditingController _bioController = TextEditingController();
 
-  String? _selectedCareer;
+  int? _selectedCareer;
   String? _selectedGender;
+  List<Career> _careerOptions = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCareerOptions();
+  }
+
+  void _loadCareerOptions() async {
+    try {
+      final response =
+          await http.get(Uri.parse('http://192.168.43.68:3000/carrera/mostrarCarrera'));
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          _careerOptions = data
+              .map<Career>((career) => Career(career['id_carrera'], career['carrera']))
+              .toList();
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load career options');
+      }
+    } catch (e) {
+      print('Error: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   void _register() {
     if (_formKey.currentState!.validate()) {
-      // Aquí pones la lógica para registrar el usuario
+      print('Nombre de usuario: ${_usernameController.text}');
       print('Nombre: ${_nameController.text}');
       print('Apellidos: ${_surnameController.text}');
       print('Email: ${_emailController.text}');
@@ -32,6 +75,9 @@ class _RegisterPageState extends State<RegisterPage> {
       print('Género: $_selectedGender');
       print('Fecha de ingreso: ${_entryDateController.text}');
       print('ID estudiantil: ${_studentIdController.text}');
+      print('Fecha de nacimiento: ${_birthdateController.text}');
+      print('Bio: ${_bioController.text}');
+
       Navigator.pushReplacementNamed(context, '/main');
     }
   }
@@ -44,216 +90,238 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Image.asset(
-                    'assets/logo.png', // Aquí se pone el logo
-                    height: 120.0,
-                  ),
-                  Text(
-                    'Registro',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Nombre',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ingresa tu nombre';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    controller: _surnameController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Apellidos',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ingresa tus apellidos';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  DropdownButtonFormField<String>(
-                    value: _selectedCareer,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Carrera',
-                    ),
-                    items: ['Ingeniería', 'Medicina', 'Derecho', 'Arquitectura']
-                        .map((career) {
-                      return DropdownMenuItem(
-                        value: career,
-                        child: Text(career),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedCareer = value;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Selecciona tu carrera';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    controller: _semesterController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Semestre',
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ingresa tu semestre';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  DropdownButtonFormField<String>(
-                    value: _selectedGender,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Género',
-                    ),
-                    items: ['Masculino', 'Femenino', 'Otro']
-                        .map((gender) {
-                      return DropdownMenuItem(
-                        value: gender,
-                        child: Text(gender),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedGender = value;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Selecciona tu género';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    controller: _entryDateController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Fecha de ingreso',
-                    ),
-                    keyboardType: TextInputType.datetime,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ingresa tu fecha de ingreso';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    controller: _studentIdController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'ID estudiantil',
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ingresa tu ID estudiantil';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Email',
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ingresa tu email';
-                      }
-                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                        return 'Ingresa un email válido';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Contraseña',
-                    ),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ingresa tu contraseña';
-                      }
-                      if (value.length < 6) {
-                        return 'La contraseña debe tener al menos 6 caracteres';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 32.0),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _register,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 3, 5, 133), // Color del botón
-                        padding: EdgeInsets.symmetric(vertical: 16.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
+        child: SingleChildScrollView(
+          child: _isLoading
+              ? CircularProgressIndicator()
+              : Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        'assets/logo.png',
+                        height: 120.0,
                       ),
-                      child: Text(
-                        'Registrarse',
+                      Text(
+                        'Registro',
                         style: TextStyle(
-                          fontSize: 18.0,
-                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Nombre de Usuario',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tu nombre de usuario';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Nombre',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tu nombre';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _surnameController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Apellidos',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tus apellidos';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Correo Electrónico',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tu correo electrónico';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _phoneController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Número de Teléfono',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tu número de teléfono';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Contraseña',
+                        ),
+                        obscureText: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa una contraseña';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      DropdownButtonFormField<int>(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Carrera',
+                        ),
+                        value: _selectedCareer,
+                        items: _careerOptions.map((Career career) {
+                          return DropdownMenuItem<int>(
+                            value: career.id,
+                            child: Text(career.name),
+                          );
+                        }).toList(),
+                        onChanged: (int? newValue) {
+                          setState(() {
+                            _selectedCareer = newValue;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Selecciona una carrera';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _semesterController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Semestre',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tu semestre';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Género',
+                        ),
+                        value: _selectedGender,
+                        items: <String>['Masculino', 'Femenino', 'Otro']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedGender = newValue;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Selecciona tu género';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _entryDateController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Fecha de Ingreso',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tu fecha de ingreso';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _studentIdController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'ID Estudiantil',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tu ID estudiantil';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _birthdateController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Fecha de Nacimiento',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tu fecha de nacimiento';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _bioController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Bio',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tu bio';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _register,
+                        child: Text('Registrar'),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 16.0),
-                  Text(
-                    'By clicking continue, you agree to our Terms of Service and Privacy Policy',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-          ),
+                ),
         ),
       ),
     );

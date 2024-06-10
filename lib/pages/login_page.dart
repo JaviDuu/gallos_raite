@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'register_page.dart';
+import 'users_info.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,6 +15,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: LoginPage(),
+      routes: {
+        '/users': (context) => UsersInfo(), // Ensure you have a RegisterPage class defined in register_page.dart
+      },
     );
   }
 }
@@ -28,13 +32,22 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-// Aquí pueden agregar la lógica de autenticación, si no les sirve quitenlo
+  // Aquí pueden agregar la lógica de autenticación, si no les sirve quitenlo
   void _login() {
-    if (_formKey.currentState!.validate()) {
-      print('Email: ${_emailController.text}');
-      print('Password: ${_passwordController.text}');
+  if (_formKey.currentState!.validate()) {
+    print('Email: ${_emailController.text}');
+    print('Password: ${_passwordController.text}');
+
+    // Verificar si las credenciales son del administrador
+    if (_emailController.text == 'admin@email.com' && _passwordController.text == 'admin123') {
+      Navigator.pushReplacementNamed(context, '/elasticsearch'); // Ir directamente a la pantalla del administrador
+      return;
     }
+
+    // Aquí va tu lógica de autenticación normal para otros usuarios
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     child: Text(
-                      'iniciar sesión',
+                      'Iniciar sesión',
                       style: TextStyle(
                         fontSize: 18.0,
                         color: Colors.white,
@@ -137,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                     Text('¿Aún no tienes una cuenta?'),
                     TextButton(
                       onPressed: () {
-                         Navigator.pushNamed(context, '/register'); // Navegar a la pantalla de registro
+                         Navigator.pushNamed(context, '/users'); // Navegar a la pantalla de registro
                       },
                       child: Text('Registrarse ahora.'),
                     ),
