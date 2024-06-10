@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => RegisterPage(), // Agrega la ruta para la página de registro
         '/admin': (context) => AdminScreen(), // Ruta para la pantalla del administrador
       },
+
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'route_model.dart';
 import 'new_route_info_page.dart'; // Importamos la página para la información adicional de la ruta
@@ -16,18 +18,21 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _loadFakeRoutes();
+    _fetchRoutes();
   }
 
-  void _loadFakeRoutes() {
-    setState(() {
-      _routes = [
-        RouteModel(id: '1', routeName: 'Ruta 1', origin: 'Campus Norte', destination: 'Residencias A'),
-        RouteModel(id: '2', routeName: 'Ruta 2', origin: 'Campus Sur', destination: 'Centro Comercial B'),
-        RouteModel(id: '3', routeName: 'Ruta 3', origin: 'Biblioteca', destination: 'Residencias C'),
-        // Agrega más rutas de ejemplo según sea necesario
-      ];
-    });
+  Future<void> _fetchRoutes() async {
+    final response = await http.get(Uri.parse('http://192.168.43.141:3000/viaje/mostrarViajes'));
+    
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      setState(() {
+        _routes = data.map((json) => RouteModel.fromJson(json)).toList();
+      });
+    } else {
+      // Manejo de errores
+      throw Exception('Error al cargar los datos de los viajes');
+    }
   }
 
   @override
@@ -109,8 +114,8 @@ class _HomePageState extends State<HomePage> {
       itemBuilder: (context, index) {
         final route = _routes[index];
         return ListTile(
-          title: Text(route.routeName),
-          subtitle: Text('${route.origin} -> ${route.destination}'),
+          title: Text('Viaje ${route.idViaje} - ${route.status}'),
+          subtitle: Text('Costo: ${route.costo} - Asientos disponibles: ${route.asientosDisponibles}'),
           onTap: () {
             // Lógica para ver detalles de la ruta
           },

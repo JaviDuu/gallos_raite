@@ -49,7 +49,7 @@ class _UsersInfoState extends State<UsersInfo> {
     }
   }
 
-  void _register() async {
+  void _registerAndNavigate() async {
     if (_formKey.currentState!.validate()) {
       // Obtener los valores de los controladores
       String usuario = _usernameController.text;
@@ -66,7 +66,7 @@ class _UsersInfoState extends State<UsersInfo> {
       // Enviar la solicitud POST al API
       try {
         final response = await http.post(
-          Uri.parse('http://192.168.43.68:3000/sesiones/insertarSesion'),
+          Uri.parse('http://192.168.43.141:3000/sesiones/insertarSesion'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
@@ -77,7 +77,7 @@ class _UsersInfoState extends State<UsersInfo> {
         if (response.statusCode == 201) {
           // El registro fue exitoso, puedes realizar cualquier acción adicional aquí
           print('Registro exitoso');
-          Navigator.pushReplacementNamed(context, '/main');
+          Navigator.pushReplacementNamed(context, '/register'); // Redirigir a la página de registro
         } else {
           // Hubo un error en la solicitud
           print('Error en la solicitud: ${response.statusCode}');
@@ -162,8 +162,8 @@ class _UsersInfoState extends State<UsersInfo> {
                       ),
                       SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: _register,
-                        child: Text('Registrar'),
+                        onPressed: _registerAndNavigate,
+                        child: Text('Siguiente'),
                       ),
                     ],
                   ),

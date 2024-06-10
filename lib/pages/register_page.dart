@@ -42,7 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void _loadCareerOptions() async {
     try {
       final response =
-          await http.get(Uri.parse('http://192.168.43.68:3000/carrera/mostrarCarrera'));
+          await http.get(Uri.parse('http://192.168.43.141:3000/carrera/mostrarCarrera'));
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         setState(() {
@@ -110,20 +110,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       SizedBox(height: 20),
                       TextFormField(
-                        controller: _usernameController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Nombre de Usuario',
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Ingresa tu nombre de usuario';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 20),
-                      TextFormField(
                         controller: _nameController,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -174,21 +160,6 @@ class _RegisterPageState extends State<RegisterPage> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Ingresa tu número de teléfono';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 20),
-                      TextFormField(
-                        controller: _passwordController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Contraseña',
-                        ),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Ingresa una contraseña';
                           }
                           return null;
                         },
@@ -268,20 +239,6 @@ class _RegisterPageState extends State<RegisterPage> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Ingresa tu fecha de ingreso';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 20),
-                      TextFormField(
-                        controller: _studentIdController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'ID Estudiantil',
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Ingresa tu ID estudiantil';
                           }
                           return null;
                         },
